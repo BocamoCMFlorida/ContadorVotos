@@ -1,23 +1,28 @@
 package com.example.demo5;
 
-import java.util.ArrayList;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 
-public class Main {
+public class Main extends Application {
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        // Cargar el archivo FXML
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
+
+        // Crear la escena con el contenido del FXML
+        Scene scene = new Scene(loader.load(), 300, 200);
+
+        // Configurar la ventana principal
+        primaryStage.setTitle("Pantalla de Login");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     public static void main(String[] args) {
-
-        UsuarioModel um = new UsuarioModel(); // Create an instance of UsuarioModel
-
-        // Get the list of users from the UsuarioModel
-        ArrayList<Usuario> usuarios = um.getUsuario();
-
-        // Check if the list is not empty and iterate over it
-        for (Usuario usuario : usuarios) {
-            System.out.println("DNI: " + usuario.getDNI());
-            System.out.println("Nombre: " + usuario.getNombre());
-            System.out.println("Edad: " + usuario.getEdad());
-            System.out.println("Sexo: " + usuario.getSexo());
-            System.out.println("Ha Votado: " + (usuario.isHaVotado() ? "Sí" : "No"));
-            System.out.println("------------");
-        }
+        launch(args);
     }
 }
