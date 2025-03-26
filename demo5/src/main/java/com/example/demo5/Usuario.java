@@ -55,4 +55,13 @@ private boolean HaVotado;
     public void setHaVotado(boolean haVotado) {
         HaVotado = haVotado;
     }
+
+    public Usuario(String DNI, String contraseña, String nombre, int edad, String sexo, boolean haVotado) {
+        this.DNI = DNI;
+        this.contraseña = contraseña;
+        this.nombre = nombre;
+        this.edad = edad;
+        this.sexo = sexo;
+        HaVotado = haVotado;
+    }
 }
