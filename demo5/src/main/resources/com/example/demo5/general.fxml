@@ -1,31 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Scene?>
+<?import javafx.scene.control.Alert?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Alert.AlertType?>
+<?import javafx.scene.input.MouseEvent?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo5.GeneralController" alignment="CENTER" spacing="20" style="-fx-background-color: #f4f4f9;" padding="20">
-    <!-- Título de la Aplicación -->
-    <Label text="Sistema de Votaciones / Elecciones" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;" />
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo5.GeneralController">
+    <children>
+        <!-- Título de la Pantalla -->
+        <Label text="Sistema de Votación" layoutX="250" layoutY="20" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-    <!-- Descripción de la elección -->
-    <Label text="Elige el partido político de tu preferencia y vota" style="-fx-font-size: 16px; -fx-text-fill: #333;" />
+        <!-- Tabla para mostrar los partidos -->
+        <TableView fx:id="tablaPartidos" layoutX="50" layoutY="100" prefHeight="400" prefWidth="600">
+            <columns>
+                <!-- Columna Nombre del Partido -->
+                <TableColumn fx:id="colNombre" text="Nombre" />
 
-    <!-- Lista de Partidos -->
-    <VBox spacing="10" alignment="CENTER">
-        <Button text="Votar por Partido A" style="-fx-font-size: 16px; -fx-background-color: #4CAF50; -fx-text-fill: white;" fx:id="btnPartidoA" />
-        <Button text="Votar por Partido B" style="-fx-font-size: 16px; -fx-background-color: #2196F3; -fx-text-fill: white;" fx:id="btnPartidoB" />
-        <Button text="Votar por Partido C" style="-fx-font-size: 16px; -fx-background-color: #FF5722; -fx-text-fill: white;" fx:id="btnPartidoC" />
-    </VBox>
+                <!-- Columna Siglas del Partido -->
+                <TableColumn fx:id="colSiglas" text="Siglas" />
 
-    <!-- Botones de Navegación -->
-    <VBox spacing="20">
-        <Button text="Ver Resultados" style="-fx-font-size: 16px; -fx-background-color: #FFC107; -fx-text-fill: white;" fx:id="btnVerResultados" />
-        <Button text="Cerrar Sesión" style="-fx-font-size: 16px; -fx-background-color: #9E9E9E; -fx-text-fill: white;" fx:id="btnCerrarSesion" />
-    </VBox>
+                <!-- Columna Votos del Partido -->
+                <TableColumn fx:id="colVotos" text="Votos" />
+            </columns>
+        </TableView>
 
-    <!-- Resultado de la votación -->
-    <Label fx:id="labelResultado" text="Resultados: 0 Votos" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;" />
-</VBox>
+        <!-- Botón para votar -->
+        <Button fx:id="btnVotar" text="Votar" layoutX="50" layoutY="520" onMouseClicked="#votarPartido" />
+
+        <!-- Botón para cerrar sesión -->
+        <Button fx:id="cerrarSesionBtn" text="Salir" layoutX="150" layoutY="520" onMouseClicked="#cerrarSesion" />
+
+    </children>
+</AnchorPane>
