@@ -75,7 +75,7 @@ public class LoginController {
         alert.showAndWait();
     }
 
-    // Método para cambiar a la pantalla principal después del login exitoso
+    //cargar pantalla
     private void cambiarPantalla() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("general.fxml"));
@@ -84,7 +84,7 @@ public class LoginController {
             // Obtener el Stage actual y cambiar la escena
             Stage stage = (Stage) dniField.getScene().getWindow();
             stage.setScene(scene);
-            stage.setTitle("Dashboard");
+            stage.setTitle("General");
         } catch (IOException e) {
             e.printStackTrace();
             mostrarAlerta("Error", "No se pudo cargar la pantalla principal", Alert.AlertType.ERROR);
