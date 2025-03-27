@@ -1,9 +1,13 @@
 package com.example.demo5;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,6 +29,7 @@ public class LoginController {
         // Validación de las credenciales con la base de datos
         if (validarLogin(dni, password)) {
             System.out.println("Login exitoso");
+            cambiarPantalla();  // Cambio de pantalla después del login exitoso
         } else {
             mostrarAlerta("Error", "Credenciales incorrectas", Alert.AlertType.ERROR);
         }
@@ -68,5 +73,21 @@ public class LoginController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // Método para cambiar a la pantalla principal después del login exitoso
+    private void cambiarPantalla() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("general.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            // Obtener el Stage actual y cambiar la escena
+            Stage stage = (Stage) dniField.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Dashboard");
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar la pantalla principal", Alert.AlertType.ERROR);
+        }
     }
 }
