@@ -1,13 +1,26 @@
 package com.example.demo5;
 
 public class Usuario {
-private String DNI;
-private String contraseña;
-private String nombre;
-private int edad;
-private String sexo;
-private boolean HaVotado;
+    private String DNI;
+    private String contraseña;
+    private String nombre;
+    private int edad;
+    private String sexo;
+    private boolean HaVotado;
 
+    // Variable estática para almacenar el usuario autenticado
+    private static Usuario usuarioActual;
+
+    public Usuario(String DNI, String contraseña, String nombre, int edad, String sexo, boolean haVotado) {
+        this.DNI = DNI;
+        this.contraseña = contraseña;
+        this.nombre = nombre;
+        this.edad = edad;
+        this.sexo = sexo;
+        this.HaVotado = haVotado;
+    }
+
+    // Métodos Getter y Setter
     public String getDNI() {
         return DNI;
     }
@@ -56,12 +69,12 @@ private boolean HaVotado;
         HaVotado = haVotado;
     }
 
-    public Usuario(String DNI, String contraseña, String nombre, int edad, String sexo, boolean haVotado) {
-        this.DNI = DNI;
-        this.contraseña = contraseña;
-        this.nombre = nombre;
-        this.edad = edad;
-        this.sexo = sexo;
-        HaVotado = haVotado;
+    // Métodos para manejar el usuario autenticado
+    public static void setUsuarioActual(Usuario usuario) {
+        usuarioActual = usuario;
+    }
+
+    public static Usuario getUsuarioActual() {
+        return usuarioActual;
     }
 }
