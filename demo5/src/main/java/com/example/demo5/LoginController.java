@@ -29,11 +29,16 @@ public class LoginController {
         // Validación de las credenciales con la base de datos
         if (validarLogin(dni, password)) {
             System.out.println("Login exitoso");
+
+            // Guardar el DNI del usuario autenticado en la sesión
+            UsuarioSesion.setDniActual(dni); // Aquí guardamos el DNI
+
             cambiarPantalla();  // Cambio de pantalla después del login exitoso
         } else {
             mostrarAlerta("Error", "Credenciales incorrectas", Alert.AlertType.ERROR);
         }
     }
+
 
     // Método para validar el login mediante la base de datos
     private boolean validarLogin(String dni, String password) {
