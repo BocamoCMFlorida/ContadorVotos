@@ -3,9 +3,14 @@ package com.example.demo5;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -152,15 +157,34 @@ public class GeneralController {
         alert.showAndWait();
     }
 
+
     @FXML
     private void cerrarSesion(MouseEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Cerrar sesión");
         alert.setHeaderText("¿Estás seguro de que deseas cerrar sesión?");
+        alert.setContentText("Se cerrará tu sesión y volverás a la pantalla de inicio.");
+
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                // Implementar la lógica para redirigir al login
+                UsuarioSesion.cerrarSesion();
+
+                cambiarPantallaLogin();
             }
         });
+    }
+    private void cambiarPantallaLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load(), 320, 240);
+
+            Stage stage = (Stage) cerrarSesionBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Login");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar el login", Alert.AlertType.ERROR);
+        }
     }
 }
