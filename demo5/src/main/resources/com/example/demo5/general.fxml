@@ -10,27 +10,20 @@
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo5.GeneralController">
     <children>
-        <!-- Título de la Pantalla -->
         <Label text="Sistema de Votación" layoutX="250" layoutY="20" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-        <!-- Tabla para mostrar los partidos -->
         <TableView fx:id="tablaPartidos" layoutX="50" layoutY="100" prefHeight="400" prefWidth="600">
             <columns>
-                <!-- Columna Nombre del Partido -->
                 <TableColumn fx:id="colNombre" text="Nombre" />
 
-                <!-- Columna Siglas del Partido -->
                 <TableColumn fx:id="colSiglas" text="Siglas" />
 
-                <!-- Columna Votos del Partido -->
                 <TableColumn fx:id="colVotos" text="Votos" />
             </columns>
         </TableView>
 
-        <!-- Botón para votar -->
         <Button fx:id="btnVotar" text="Votar" layoutX="50" layoutY="520" onMouseClicked="#votarPartido" />
 
-        <!-- Botón para cerrar sesión -->
         <Button fx:id="cerrarSesionBtn" text="Salir" layoutX="150" layoutY="520" onMouseClicked="#cerrarSesion" />
 
     </children>
