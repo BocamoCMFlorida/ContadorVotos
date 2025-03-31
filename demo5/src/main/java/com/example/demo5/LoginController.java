@@ -85,8 +85,6 @@ public class LoginController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("general.fxml"));
             Scene scene = new Scene(loader.load());
-
-            // Obtener el Stage actual y cambiar la escena
             Stage stage = (Stage) dniField.getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("General");
