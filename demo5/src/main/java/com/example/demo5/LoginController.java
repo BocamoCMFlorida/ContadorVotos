@@ -59,7 +59,24 @@ public class LoginController {
             try (ResultSet rs = ps.executeQuery()) {
                 // Si se encuentra un registro que coincida con el DNI y la contraseña, se realiza login
                 if (rs.next()) {
-                    return true;
+                    // Obtener si el usuario es administrador
+                    boolean esAdmin = rs.getBoolean("es_admin");
+
+                    // Crear un objeto Usuario con los datos obtenidos
+                    Usuario usuario = new Usuario(
+                            rs.getString("DNI"),
+                            rs.getString("contraseña"),
+                            rs.getString("nombre"),
+                            rs.getInt("edad"),
+                            rs.getString("sexo"),
+                            rs.getBoolean("HaVotado"),
+                            esAdmin
+                    );
+
+                    // Guardar el usuario autenticado en la sesión
+                    Usuario.setUsuarioActual(usuario);
+
+                    return true;  // Login exitoso
                 }
             }
         } catch (SQLException e) {
@@ -72,6 +89,7 @@ public class LoginController {
         return false;
     }
 
+
     private void mostrarAlerta(String title, String message, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(title);
@@ -83,7 +101,15 @@ public class LoginController {
     //cargar pantalla
     private void cambiarPantalla() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("general.fxml"));
+            Usuario usuarioActual = Usuario.getUsuarioActual();
+            FXMLLoader loader;
+            if (usuarioActual.isEs_admin()) {
+                // Si es administrador, cargar la pantalla de administrador
+                loader = new FXMLLoader(getClass().getResource("admin-view.fxml"));
+            } else {
+                // Si es un usuario normal, cargar la pantalla de usuario normal
+                loader = new FXMLLoader(getClass().getResource("general.fxml"));
+            }
             Scene scene = new Scene(loader.load());
             Stage stage = (Stage) dniField.getScene().getWindow();
             stage.setScene(scene);
