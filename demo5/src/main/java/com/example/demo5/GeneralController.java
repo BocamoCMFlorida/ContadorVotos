@@ -60,7 +60,7 @@ public class GeneralController {
 
     @FXML
     private void votarPartido(MouseEvent event) {
-        String dni = usuarioService.getCurrentUserDNI(); // Usar el servicio para obtener el DNI
+        String dni = usuarioService.getCurrentUserDNI();
 
         if (dni == null) {
             mostrarAlerta("Error", "No hay un usuario autenticado.", Alert.AlertType.ERROR);
