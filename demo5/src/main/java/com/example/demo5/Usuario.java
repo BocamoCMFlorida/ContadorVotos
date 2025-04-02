@@ -7,17 +7,20 @@ public class Usuario {
     private int edad;
     private String sexo;
     private boolean HaVotado;
+    private boolean es_admin;
+
 
     // Variable estática para almacenar el usuario autenticado
     private static Usuario usuarioActual;
 
-    public Usuario(String DNI, String contraseña, String nombre, int edad, String sexo, boolean haVotado) {
+    public Usuario(String DNI, String contraseña, String nombre, int edad, String sexo, boolean haVotado, boolean es_admin) {
         this.DNI = DNI;
         this.contraseña = contraseña;
         this.nombre = nombre;
         this.edad = edad;
         this.sexo = sexo;
-        this.HaVotado = haVotado;
+        HaVotado = haVotado;
+        this.es_admin = es_admin;
     }
 
     // Métodos Getter y Setter
@@ -76,5 +79,13 @@ public class Usuario {
 
     public static Usuario getUsuarioActual() {
         return usuarioActual;
+    }
+
+    public boolean isEs_admin() {
+        return es_admin;
+    }
+
+    public void setEs_admin(boolean es_admin) {
+        this.es_admin = es_admin;
     }
 }
