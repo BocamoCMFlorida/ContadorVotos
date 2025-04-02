@@ -21,8 +21,9 @@ public class UsuarioModel extends DBUtil {
                 int edad = rs.getInt("edad");
                 String sexo = rs.getString("sexo");
                 boolean HaVotado = rs.getBoolean("HaVotado");
+                boolean es_admin = rs.getBoolean("es_admin");
 
-                Usuario u = new Usuario(DNI, contraseña, nombre, edad, sexo, HaVotado);
+                Usuario u = new Usuario(DNI, contraseña, nombre, edad, sexo, HaVotado,es_admin);
                 resultado.add(u);
             }
 
@@ -36,7 +37,7 @@ public class UsuarioModel extends DBUtil {
     public boolean insert(Usuario u) {
         boolean resultado = false;
         try {
-            String sql = "INSERT INTO usuario (DNI, contraseña, nombre, edad, sexo, HaVotado) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO usuario (DNI, contraseña, nombre, edad, sexo, HaVotado,es_admin) VALUES (?, ?, ?, ?, ?, ?,?)";
             PreparedStatement ps = this.getConexion().prepareStatement(sql);
             ps.setString(1, u.getDNI());
             ps.setString(2, u.getContraseña());
@@ -44,6 +45,7 @@ public class UsuarioModel extends DBUtil {
             ps.setInt(4, u.getEdad());
             ps.setString(5, u.getSexo());
             ps.setBoolean(6, u.isHaVotado());
+            ps.setBoolean(7,u.isEs_admin());
             resultado = ps.execute();
         } catch (SQLException e) {
             e.printStackTrace();
