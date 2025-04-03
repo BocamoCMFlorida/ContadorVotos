@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -12,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class LoginController {
 
@@ -103,20 +105,38 @@ public class LoginController {
         try {
             Usuario usuarioActual = Usuario.getUsuarioActual();
             FXMLLoader loader;
+
             if (usuarioActual.isEs_admin()) {
-                // Si es administrador, cargar la pantalla de administrador
-                loader = new FXMLLoader(getClass().getResource("admin-view.fxml"));
+                // Preguntar si quiere entrar como admin o usuario
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Modo de acceso");
+                alert.setHeaderText("Eres administrador");
+                alert.setContentText("¿Cómo deseas ingresar?");
+
+                ButtonType botonAdmin = new ButtonType("Administrador");
+                ButtonType botonUsuario = new ButtonType("Usuario");
+
+                alert.getButtonTypes().setAll(botonAdmin, botonUsuario);
+                Optional<ButtonType> resultado = alert.showAndWait();
+
+                if (resultado.isPresent() && resultado.get() == botonAdmin) {
+                    loader = new FXMLLoader(getClass().getResource("admin-view.fxml"));
+                } else {
+                    loader = new FXMLLoader(getClass().getResource("general.fxml"));
+                }
             } else {
-                // Si es un usuario normal, cargar la pantalla de usuario normal
+                // Si es usuario normal, cargar la pantalla correspondiente
                 loader = new FXMLLoader(getClass().getResource("general.fxml"));
             }
+
             Scene scene = new Scene(loader.load());
             Stage stage = (Stage) dniField.getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("General");
+
         } catch (IOException e) {
             e.printStackTrace();
             mostrarAlerta("Error", "No se pudo cargar la pantalla principal", Alert.AlertType.ERROR);
         }
     }
-}
+    }
