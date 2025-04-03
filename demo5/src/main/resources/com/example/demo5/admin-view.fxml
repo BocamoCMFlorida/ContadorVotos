@@ -1,14 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo5.AdminController"
             prefHeight="400.0" prefWidth="600.0">
+
+    <VBox spacing="10" alignment="CENTER" prefWidth="600.0">
+        <!-- Título -->
+        <Label text="Panel de Administrador" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+        <!-- Tabla de Usuarios -->
+        <TableView fx:id="tablaUsuarios" prefHeight="250.0" prefWidth="580.0">
+            <columns>
+                <TableColumn text="DNI" fx:id="columnaDNI" prefWidth="100"/>
+                <TableColumn text="Nombre" fx:id="columnaNombre" prefWidth="150"/>
+                <TableColumn text="Edad" fx:id="columnaEdad" prefWidth="50"/>
+                <TableColumn text="Sexo" fx:id="columnaSexo" prefWidth="80"/>
+                <TableColumn text="¿Ha Votado?" fx:id="columnaHaVotado" prefWidth="100"/>
+                <TableColumn text="Admin" fx:id="columnaAdmin" prefWidth="80"/>
+            </columns>
+        </TableView>
+
+        <!-- Botones -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Agregar Usuario" fx:id="btnAgregarUsuario"/>
+            <Button text="Eliminar Usuario" fx:id="btnEliminarUsuario"/>
+            <Button text="Cerrar Sesión" fx:id="btnCerrarSesion"/>
+        </HBox>
+    </VBox>
+
+    <!-- Formulario para agregar usuario -->
+    <AnchorPane fx:id="formAgregarUsuario" visible="false" layoutX="50" layoutY="80">
+        <VBox spacing="10" alignment="CENTER">
+            <TextField fx:id="dniField" promptText="DNI"/>
+            <TextField fx:id="nombreField" promptText="Nombre"/>
+            <TextField fx:id="edadField" promptText="Edad"/>
+            <ComboBox fx:id="sexoComboBox">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String/>
+                        <String fx:value="Femenino"/>
+                        <String fx:value="Otro"/>
+                    </FXCollections>
+                </items>
+            </ComboBox>
+            <CheckBox fx:id="adminCheckBox" text="¿Es Administrador?"/>
+            <Button text="Guardar" fx:id="btnGuardarUsuario"/>
+            <Button text="Cancelar" fx:id="btnCancelarAgregarUsuario"/>
+        </VBox>
+    </AnchorPane>
 
 </AnchorPane>
