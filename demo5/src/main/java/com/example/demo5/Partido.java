@@ -1,12 +1,19 @@
 package com.example.demo5;
 
 public class Partido {
+    private int id;
     private String nombre;
     private int votos;
     private String siglas;
 
     // Constructor
-    public Partido(String nombre, int votos, String siglas) {
+    public Partido(int id, String nombre, int votos, String siglas) {
+        this.id = id;
+        this.nombre = nombre;
+        this.votos = votos;
+        this.siglas = siglas;
+    }
+    public Partido( String nombre, int votos, String siglas) {
         this.nombre = nombre;
         this.votos = votos;
         this.siglas = siglas;
@@ -35,6 +42,14 @@ public class Partido {
 
     public void setSiglas(String siglas) {
         this.siglas = siglas;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Constructor sin parámetros
