@@ -3,9 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
+
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo5.AdminController"
@@ -27,15 +27,19 @@
             </columns>
         </TableView>
 
-        <!-- Botones -->
+        <!-- Botones principales -->
         <HBox spacing="10" alignment="CENTER">
-            <Button text="Agregar Usuario" fx:id="btnAgregarUsuario"/>
-            <Button text="Eliminar Usuario" fx:id="btnEliminarUsuario"/>
-            <Button text="Cerrar Sesión" fx:id="btnCerrarSesion"/>
+            <Button text="Agregar Usuario" fx:id="btnAgregarUsuario" onAction="#agregarUsuario"/>
+            <Button text="Eliminar Usuario" fx:id="btnEliminarUsuario" onAction="#eliminarUsuario"/>
+            <Button text="Modificar Usuario" fx:id="btnModificarUsuario" onAction="#modificarUsuario"/>
+            <Button text="Cerrar Sesión" fx:id="btnCerrarSesion" onMouseClicked="#cerrarSesion"/>
+            <Button text="Ver partidos" fx:id="btnVerpartidos" onMouseClicked="#cambiarPantallaPartidos"/>
+
+
         </HBox>
     </VBox>
 
-    <!-- Formulario para agregar usuario -->
+    <!-- Formulario para agregar usuario (opcional, aún no usado en el controlador actual) -->
     <AnchorPane fx:id="formAgregarUsuario" visible="false" layoutX="50" layoutY="80">
         <VBox spacing="10" alignment="CENTER">
             <TextField fx:id="dniField" promptText="DNI"/>
@@ -44,15 +48,15 @@
             <ComboBox fx:id="sexoComboBox">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
-                        <String/>
+                        <String fx:value="Masculino"/>
                         <String fx:value="Femenino"/>
                         <String fx:value="Otro"/>
                     </FXCollections>
                 </items>
             </ComboBox>
             <CheckBox fx:id="adminCheckBox" text="¿Es Administrador?"/>
-            <Button text="Guardar" fx:id="btnGuardarUsuario"/>
-            <Button text="Cancelar" fx:id="btnCancelarAgregarUsuario"/>
+            <Button text="Guardar" fx:id="btnGuardarUsuario" onAction="#guardarUsuario"/>
+            <Button text="Cancelar" fx:id="btnCancelarAgregarUsuario" onAction="#cancelarAgregarUsuario"/>
         </VBox>
     </AnchorPane>
 
