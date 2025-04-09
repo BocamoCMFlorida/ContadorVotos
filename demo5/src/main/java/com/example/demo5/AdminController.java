@@ -4,57 +4,56 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.Optional;
 
 public class AdminController {
 
-    @FXML
-    private TableView<Usuario> tablaUsuarios;
-    @FXML
-    private TableColumn<Usuario, String> columnaDNI;
-    @FXML
-    private TableColumn<Usuario, String> columnaNombre;
-    @FXML
-    private TableColumn<Usuario, Integer> columnaEdad;
-    @FXML
-    private TableColumn<Usuario, String> columnaSexo;
-    @FXML
-    private TableColumn<Usuario, String> columnaHaVotado;
-    @FXML
-    private TableColumn<Usuario, Boolean> columnaAdmin; // Cambiar tipo a Boolean
+    @FXML private TableView<Usuario> tablaUsuarios;
+    @FXML private TableColumn<Usuario, String> columnaDNI;
+    @FXML private TableColumn<Usuario, String> columnaNombre;
+    @FXML private TableColumn<Usuario, Integer> columnaEdad;
+    @FXML private TableColumn<Usuario, String> columnaSexo;
+    @FXML private TableColumn<Usuario, String> columnaHaVotado;
+    @FXML private TableColumn<Usuario, Boolean> columnaAdmin;
 
-    @FXML
-    private Button btnAgregarUsuario;
-    @FXML
-    private Button btnEliminarUsuario;
-    @FXML
-    private Button btnModificarUsuario;
+    @FXML private Button btnAgregarUsuario;
+    @FXML private Button btnEliminarUsuario;
+    @FXML private Button btnModificarUsuario;
+    @FXML private Button btnCerrarSesion;
+    @FXML private Button btnVerpartidos;
+    // Formulario embebido (opcional)
+    @FXML private AnchorPane formAgregarUsuario;
+    @FXML private TextField dniField;
+    @FXML private TextField nombreField;
+    @FXML private TextField edadField;
+    @FXML private ComboBox<String> sexoComboBox;
+    @FXML private CheckBox adminCheckBox;
 
     private ObservableList<Usuario> usuariosList = FXCollections.observableArrayList();
     private DBUtil dbUtil = new DBUtil();
 
     @FXML
     public void initialize() {
-        // Inicializamos las columnas de la tabla
         columnaDNI.setCellValueFactory(new PropertyValueFactory<>("DNI"));
         columnaNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnaEdad.setCellValueFactory(new PropertyValueFactory<>("edad"));
         columnaSexo.setCellValueFactory(new PropertyValueFactory<>("sexo"));
         columnaHaVotado.setCellValueFactory(new PropertyValueFactory<>("haVotado"));
+        columnaAdmin.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isEs_admin()));
 
-        // Modificamos la columna Admin para que funcione correctamente con el tipo boolean
-        columnaAdmin.setCellValueFactory(cellData -> {
-            Usuario usuario = cellData.getValue();
-            return new SimpleBooleanProperty(usuario.isEs_admin());  // Devuelve un SimpleBooleanProperty
-        });
+        sexoComboBox.setItems(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));
 
-        // Cargamos los datos en la tabla
         cargarDatosUsuarios();
     }
 
@@ -66,80 +65,54 @@ public class AdminController {
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
 
-            // Verificar si la consulta devuelve resultados
-            if (!rs.isBeforeFirst()) {
-                System.out.println("No hay usuarios en la base de datos.");
-            }
-
             while (rs.next()) {
                 String dni = rs.getString("DNI");
                 String nombre = rs.getString("nombre");
                 int edad = rs.getInt("edad");
                 String sexo = rs.getString("sexo");
-
-                // Obtener el valor booleano de HaVotado, asegurándonos de que no sea NULL
                 boolean haVotado = rs.getBoolean("HaVotado");
-                if (rs.wasNull()) { // Si el valor de HaVotado es NULL en la base de datos, asignar false
-                    haVotado = false;
-                }
-
-                // Obtener el valor booleano de es_admin, asegurándonos de que no sea NULL
+                if (rs.wasNull()) haVotado = false;
                 boolean esAdmin = rs.getBoolean("es_admin");
-                if (rs.wasNull()) { // Si el valor de es_admin es NULL en la base de datos, asignar false
-                    esAdmin = false;
-                }
+                if (rs.wasNull()) esAdmin = false;
 
-                // Crear el objeto Usuario y agregarlo a la lista
                 usuariosList.add(new Usuario(dni, "", nombre, edad, sexo, haVotado, esAdmin));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        // Establecer los datos a la tabla
         tablaUsuarios.setItems(usuariosList);
     }
 
-    // Agregar Usuario
     @FXML
     private void agregarUsuario() {
-        // Crear formulario para agregar un nuevo usuario
-        Dialog<Usuario> dialog = new Dialog<>();
-        dialog.setTitle("Agregar Usuario");
+        formAgregarUsuario.setVisible(true); // Mostrar el formulario embebido
+    }
 
-        // Crear un formulario de entrada con los campos necesarios
-        // (DNI, nombre, edad, sexo, admin)
-        TextField dniField = new TextField();
-        dniField.setPromptText("DNI");
-        TextField nombreField = new TextField();
-        nombreField.setPromptText("Nombre");
-        TextField edadField = new TextField();
-        edadField.setPromptText("Edad");
-        ComboBox<String> sexoComboBox = new ComboBox<>(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));
-        CheckBox adminCheckBox = new CheckBox("Es Administrador?");
+    @FXML
+    private void guardarUsuario() {
+        String dni = dniField.getText();
+        String nombre = nombreField.getText();
+        String edadText = edadField.getText();
+        String sexo = sexoComboBox.getValue();
+        boolean esAdmin = adminCheckBox.isSelected();
 
-        // Configuramos el formulario
-        dialog.getDialogPane().setContent(new VBox(dniField, nombreField, edadField, sexoComboBox, adminCheckBox));
+        if (dni.isEmpty() || nombre.isEmpty() || edadText.isEmpty() || sexo == null) {
+            mostrarAlerta("Campos vacíos", "Por favor, completa todos los campos", Alert.AlertType.WARNING);
+            return;
+        }
 
-        ButtonType buttonTypeGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(buttonTypeGuardar, ButtonType.CANCEL);
+        int edad;
+        try {
+            edad = Integer.parseInt(edadText);
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Edad inválida", "Ingresa un número válido para la edad", Alert.AlertType.ERROR);
+            return;
+        }
 
-        // Procesar el resultado
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == buttonTypeGuardar) {
-                String dni = dniField.getText();
-                String nombre = nombreField.getText();
-                int edad = Integer.parseInt(edadField.getText());
-                String sexo = sexoComboBox.getValue();
-                boolean esAdmin = adminCheckBox.isSelected();
-
-                // Guardamos el usuario en la base de datos
-                agregarUsuarioDB(dni, nombre, edad, sexo, esAdmin);
-            }
-            return null;
-        });
-
-        dialog.showAndWait();
+        agregarUsuarioDB(dni, nombre, edad, sexo, esAdmin);
+        limpiarFormulario();
+        formAgregarUsuario.setVisible(false);
     }
 
     private void agregarUsuarioDB(String dni, String nombre, int edad, String sexo, boolean esAdmin) {
@@ -151,7 +124,7 @@ public class AdminController {
             ps.setString(2, nombre);
             ps.setInt(3, edad);
             ps.setString(4, sexo);
-            ps.setBoolean(5, false);  // Inicializamos HaVotado como false
+            ps.setBoolean(5, false); // HaVotado por defecto false
             ps.setBoolean(6, esAdmin);
             ps.executeUpdate();
             cargarDatosUsuarios();
@@ -160,16 +133,28 @@ public class AdminController {
         }
     }
 
-    // Eliminar Usuario
+    @FXML
+    private void cancelarAgregarUsuario() {
+        limpiarFormulario();
+        formAgregarUsuario.setVisible(false);
+    }
+
+    private void limpiarFormulario() {
+        dniField.clear();
+        nombreField.clear();
+        edadField.clear();
+        sexoComboBox.setValue(null);
+        adminCheckBox.setSelected(false);
+    }
+
     @FXML
     private void eliminarUsuario() {
         Usuario usuarioSeleccionado = tablaUsuarios.getSelectionModel().getSelectedItem();
 
         if (usuarioSeleccionado != null) {
-            // Confirmación de eliminación
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Eliminar Usuario");
-            alert.setHeaderText("¿Estás seguro de que deseas eliminar a este usuario?");
+            alert.setHeaderText("¿Eliminar al usuario?");
             alert.setContentText("DNI: " + usuarioSeleccionado.getDNI());
 
             Optional<ButtonType> result = alert.showAndWait();
@@ -177,8 +162,7 @@ public class AdminController {
                 eliminarUsuarioDB(usuarioSeleccionado);
             }
         } else {
-            // Si no hay usuario seleccionado
-            mostrarAlerta("Error", "Debes seleccionar un usuario para eliminar", Alert.AlertType.ERROR);
+            mostrarAlerta("Sin selección", "Selecciona un usuario para eliminar", Alert.AlertType.ERROR);
         }
     }
 
@@ -195,50 +179,141 @@ public class AdminController {
         }
     }
 
-    // Modificar Usuario
     @FXML
     private void modificarUsuario() {
         Usuario usuarioSeleccionado = tablaUsuarios.getSelectionModel().getSelectedItem();
 
-        if (usuarioSeleccionado != null) {
-            // Crear formulario para modificar los datos del usuario
-            TextInputDialog dialog = new TextInputDialog(usuarioSeleccionado.getNombre());
-            dialog.setTitle("Modificar Usuario");
-            dialog.setHeaderText("Modificar los detalles del usuario");
-
-            // Mostrar formulario para editar el nombre
-            dialog.getDialogPane().setContentText("Nuevo Nombre:");
-            Optional<String> result = dialog.showAndWait();
-
-            if (result.isPresent()) {
-                String nuevoNombre = result.get();
-                // Guardamos la modificación en la base de datos
-                modificarUsuarioDB(usuarioSeleccionado, nuevoNombre);
-            }
-        } else {
-            // Si no hay usuario seleccionado
-            mostrarAlerta("Error", "Debes seleccionar un usuario para modificar", Alert.AlertType.ERROR);
+        if (usuarioSeleccionado == null) {
+            mostrarAlerta("Sin selección", "Selecciona un usuario para modificar", Alert.AlertType.WARNING);
+            return;
         }
+
+        Dialog<Usuario> dialog = new Dialog<>();
+        dialog.setTitle("Modificar Usuario");
+
+        // Campos del formulario
+        TextField dniField = new TextField(usuarioSeleccionado.getDNI()); // Ahora editable
+        TextField nombreField = new TextField(usuarioSeleccionado.getNombre());
+        TextField edadField = new TextField(String.valueOf(usuarioSeleccionado.getEdad()));
+        ComboBox<String> sexoComboBox = new ComboBox<>(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));
+        sexoComboBox.setValue(usuarioSeleccionado.getSexo());
+        CheckBox adminCheckBox = new CheckBox("¿Es Administrador?");
+        adminCheckBox.setSelected(usuarioSeleccionado.isEs_admin());
+        CheckBox haVotadoCheckBox = new CheckBox("¿Ha Votado?");
+        haVotadoCheckBox.setSelected(usuarioSeleccionado.isHaVotado());
+
+        VBox contenido = new VBox(10,
+                new Label("DNI"), dniField,
+                new Label("Nombre"), nombreField,
+                new Label("Edad"), edadField,
+                new Label("Sexo"), sexoComboBox,
+                adminCheckBox,
+                haVotadoCheckBox
+        );
+
+        dialog.getDialogPane().setContent(contenido);
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == btnGuardar) {
+                try {
+                    int edad = Integer.parseInt(edadField.getText());
+
+                    modificarUsuarioDBCompleto(
+                            usuarioSeleccionado.getDNI(),
+                            dniField.getText(),
+                            nombreField.getText(),
+                            edad,
+                            sexoComboBox.getValue(),
+                            haVotadoCheckBox.isSelected(),
+                            adminCheckBox.isSelected()
+                    );
+                } catch (NumberFormatException e) {
+                    mostrarAlerta("Error", "Edad inválida", Alert.AlertType.ERROR);
+                }
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
     }
 
-    private void modificarUsuarioDB(Usuario usuario, String nuevoNombre) {
-        String query = "UPDATE usuario SET nombre = ? WHERE DNI = ?";
+
+
+    private void modificarUsuarioDBCompleto(String dniAnterior, String nuevoDni, String nombre, int edad, String sexo, boolean haVotado, boolean esAdmin) {
+        String query = "UPDATE usuario SET DNI = ?, nombre = ?, edad = ?, sexo = ?, HaVotado = ?, es_admin = ? WHERE DNI = ?";
 
         try (Connection conn = dbUtil.getConexion();
              PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, nuevoNombre);
-            ps.setString(2, usuario.getDNI());
+            ps.setString(1, nuevoDni);
+            ps.setString(2, nombre);
+            ps.setInt(3, edad);
+            ps.setString(4, sexo);
+            ps.setBoolean(5, haVotado);
+            ps.setBoolean(6, esAdmin);
+            ps.setString(7, dniAnterior); // Filtro por el DNI anterior
             ps.executeUpdate();
             cargarDatosUsuarios();
         } catch (SQLException e) {
             e.printStackTrace();
+            mostrarAlerta("Error al modificar", "No se pudo actualizar el usuario", Alert.AlertType.ERROR);
         }
     }
 
-    private void mostrarAlerta(String title, String message, Alert.AlertType tipo) {
+    @FXML
+    private void cerrarSesion(MouseEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Cerrar sesión");
+        alert.setHeaderText("¿Estás seguro de que deseas cerrar sesión?");
+        alert.setContentText("Se cerrará tu sesión y volverás a la pantalla de inicio.");
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                UsuarioSesion.cerrarSesion();
+                cambiarPantallaLogin();
+            }
+        });
+    }
+
+    private void cambiarPantallaLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load(), 700, 640);
+            Stage stage = (Stage) btnCerrarSesion.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Login");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar el login", Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void cambiarPantallaPartidos(MouseEvent event) {
+        cargarVistaPartidos();
+    }
+
+    private void cargarVistaPartidos() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("admin-view-partidos.fxml"));
+            Scene scene = new Scene(loader.load(), 700, 640);
+            Stage stage = (Stage) btnVerpartidos.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Panel de Partidos");
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo cargar la vista de partidos", Alert.AlertType.ERROR);
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
-        alert.setTitle(title);
-        alert.setContentText(message);
+        alert.setTitle(titulo);
+        alert.setContentText(mensaje);
         alert.showAndWait();
     }
+
+
 }
