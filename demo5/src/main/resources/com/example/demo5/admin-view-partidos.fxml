@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.demo5.AdminPartidosController"
+            prefHeight="400.0" prefWidth="600.0">
+    <VBox spacing="10" alignment="CENTER" prefWidth="600.0">
+    <!-- Título -->
+    <Label text="Panel de Administrador" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <!-- Tabla de Usuarios -->
+    <TableView fx:id="tablaPartidos" prefHeight="250.0" prefWidth="580.0">
+        <columns>
+            <TableColumn text="ID" fx:id="columnaID" prefWidth="100"/>
+            <TableColumn text="Nombre" fx:id="columnaNombre" prefWidth="150"/>
+            <TableColumn text="Siglas" fx:id="columnaSiglas" prefWidth="50"/>
+            <TableColumn text="Votos" fx:id="columnaVotos" prefWidth="80"/>
+        </columns>
+    </TableView>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Agregar Partido" fx:id="btnAgregarPartido" onAction="#agregarPartido"/>
+            <Button text="Eliminar Partido" fx:id="btnEliminarPartido" onAction="#eliminarPartido"/>
+            <Button text="Modificar Partido" fx:id="btnModificarPartido" onAction="#modificarPartido"/>
+            <Button text="Cerrar Sesión" fx:id="btnCerrarSesion" onMouseClicked="#cerrarSesion"/>
+
+        </HBox>
+</VBox>
+</AnchorPane>
