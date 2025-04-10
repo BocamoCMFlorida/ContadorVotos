@@ -22,6 +22,7 @@
                 <TableColumn text="Nombre" fx:id="columnaNombre" prefWidth="150"/>
                 <TableColumn text="Edad" fx:id="columnaEdad" prefWidth="50"/>
                 <TableColumn text="Sexo" fx:id="columnaSexo" prefWidth="80"/>
+                <TableColumn text="Contraseña" fx:id="columnaContraseña" prefWidth="80"/>
                 <TableColumn text="¿Ha Votado?" fx:id="columnaHaVotado" prefWidth="100"/>
                 <TableColumn text="Admin" fx:id="columnaAdmin" prefWidth="80"/>
             </columns>
@@ -39,7 +40,6 @@
         </HBox>
     </VBox>
 
-    <!-- Formulario para agregar usuario (opcional, aún no usado en el controlador actual) -->
     <AnchorPane fx:id="formAgregarUsuario" visible="false" layoutX="50" layoutY="80">
         <VBox spacing="10" alignment="CENTER">
             <TextField fx:id="dniField" promptText="DNI"/>
