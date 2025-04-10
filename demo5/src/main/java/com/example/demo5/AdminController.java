@@ -24,8 +24,10 @@ public class AdminController {
     @FXML private TableColumn<Usuario, String> columnaNombre;
     @FXML private TableColumn<Usuario, Integer> columnaEdad;
     @FXML private TableColumn<Usuario, String> columnaSexo;
+    @FXML private TableColumn<Usuario, String> columnaContraseña;
     @FXML private TableColumn<Usuario, String> columnaHaVotado;
     @FXML private TableColumn<Usuario, Boolean> columnaAdmin;
+
 
     @FXML private Button btnAgregarUsuario;
     @FXML private Button btnEliminarUsuario;
@@ -36,6 +38,8 @@ public class AdminController {
     @FXML private AnchorPane formAgregarUsuario;
     @FXML private TextField dniField;
     @FXML private TextField nombreField;
+    @FXML private  TextField contraseñaField;
+
     @FXML private TextField edadField;
     @FXML private ComboBox<String> sexoComboBox;
     @FXML private CheckBox adminCheckBox;
@@ -49,6 +53,7 @@ public class AdminController {
         columnaNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnaEdad.setCellValueFactory(new PropertyValueFactory<>("edad"));
         columnaSexo.setCellValueFactory(new PropertyValueFactory<>("sexo"));
+        columnaContraseña.setCellValueFactory(new PropertyValueFactory<>("contraseña"));
         columnaHaVotado.setCellValueFactory(new PropertyValueFactory<>("haVotado"));
         columnaAdmin.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isEs_admin()));
 
@@ -57,9 +62,10 @@ public class AdminController {
         cargarDatosUsuarios();
     }
 
+    // CAMBIO: agregar columna de contraseña al SELECT
     private void cargarDatosUsuarios() {
         usuariosList.clear();
-        String query = "SELECT DNI, nombre, edad, sexo, HaVotado, es_admin FROM usuario";
+        String query = "SELECT DNI, nombre, edad, sexo, contraseña, HaVotado, es_admin FROM usuario";
 
         try (Connection conn = dbUtil.getConexion();
              PreparedStatement ps = conn.prepareStatement(query);
@@ -70,23 +76,71 @@ public class AdminController {
                 String nombre = rs.getString("nombre");
                 int edad = rs.getInt("edad");
                 String sexo = rs.getString("sexo");
+                String contraseña = rs.getString("contraseña");
                 boolean haVotado = rs.getBoolean("HaVotado");
                 if (rs.wasNull()) haVotado = false;
                 boolean esAdmin = rs.getBoolean("es_admin");
                 if (rs.wasNull()) esAdmin = false;
 
-                usuariosList.add(new Usuario(dni, "", nombre, edad, sexo, haVotado, esAdmin));
+                // Asegúrate que el orden de parámetros coincida con tu constructor de Usuario
+                usuariosList.add(new Usuario(dni, contraseña, nombre, edad, sexo, haVotado, esAdmin));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
+            mostrarAlerta("Error", "No se pudieron cargar los usuarios", Alert.AlertType.ERROR);
         }
 
         tablaUsuarios.setItems(usuariosList);
     }
 
+
     @FXML
     private void agregarUsuario() {
-        formAgregarUsuario.setVisible(true); // Mostrar el formulario embebido
+        Dialog<Usuario> dialog = new Dialog<>();
+        dialog.setTitle("Agregar Usuario");
+        // Campos del formulario
+        TextField dniField = new TextField();
+        TextField nombreField = new TextField();
+        TextField edadField = new TextField();
+        TextField contraseñaField = new TextField();
+
+        ComboBox<String> sexoComboBox = new ComboBox<>(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));;
+        CheckBox adminCheckBox = new CheckBox("¿Es Administrador?");
+        VBox contenido = new VBox(10,
+                new Label("DNI"), dniField,
+                new Label("Nombre"), nombreField,
+                new Label("Edad"), edadField,
+                new Label("Sexo"), sexoComboBox,
+                new Label("contraseña"),contraseñaField,
+                adminCheckBox
+
+        );
+
+        dialog.getDialogPane().setContent(contenido);
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == btnGuardar) {
+                try {
+                    int edad = Integer.parseInt(edadField.getText());
+
+                    agregarUsuarioDB(
+                            dniField.getText(),
+                            nombreField.getText(),
+                            edad,
+                            sexoComboBox.getValue(),
+                            adminCheckBox.isSelected(),
+                            contraseñaField.getText()
+                            );
+                } catch (NumberFormatException e) {
+                    mostrarAlerta("Error", "Edad inválida", Alert.AlertType.ERROR);
+                }
+            }
+            return null;
+        });
+        dialog.showAndWait();
     }
 
     @FXML
@@ -95,9 +149,11 @@ public class AdminController {
         String nombre = nombreField.getText();
         String edadText = edadField.getText();
         String sexo = sexoComboBox.getValue();
+        String contraseña = contraseñaField.getText();
         boolean esAdmin = adminCheckBox.isSelected();
 
-        if (dni.isEmpty() || nombre.isEmpty() || edadText.isEmpty() || sexo == null) {
+        // Validaciones
+        if (dni.isEmpty() || nombre.isEmpty() || edadText.isEmpty() || sexo == null || contraseña.isEmpty()) {
             mostrarAlerta("Campos vacíos", "Por favor, completa todos los campos", Alert.AlertType.WARNING);
             return;
         }
@@ -110,13 +166,17 @@ public class AdminController {
             return;
         }
 
-        agregarUsuarioDB(dni, nombre, edad, sexo, esAdmin);
+        // Llamar al método correcto con contraseña
+        agregarUsuarioDB(dni, nombre, edad, sexo, esAdmin, contraseña);
+
         limpiarFormulario();
         formAgregarUsuario.setVisible(false);
     }
 
-    private void agregarUsuarioDB(String dni, String nombre, int edad, String sexo, boolean esAdmin) {
-        String query = "INSERT INTO usuario (DNI, nombre, edad, sexo, HaVotado, es_admin) VALUES (?, ?, ?, ?, ?, ?)";
+
+    // CAMBIO IMPORTANTE: este método tenía error en la cantidad de parámetros en la consulta SQL
+    private void agregarUsuarioDB(String dni, String nombre, int edad, String sexo, boolean esAdmin, String contraseña) {
+        String query = "INSERT INTO usuario (DNI, nombre, edad, sexo, contraseña, HaVotado, es_admin) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbUtil.getConexion();
              PreparedStatement ps = conn.prepareStatement(query)) {
@@ -124,8 +184,9 @@ public class AdminController {
             ps.setString(2, nombre);
             ps.setInt(3, edad);
             ps.setString(4, sexo);
-            ps.setBoolean(5, false); // HaVotado por defecto false
-            ps.setBoolean(6, esAdmin);
+            ps.setString(5, contraseña); // Corregido: antes estaba usando setBoolean por error
+            ps.setBoolean(6, false); // HaVotado por defecto false
+            ps.setBoolean(7, esAdmin);
             ps.executeUpdate();
             cargarDatosUsuarios();
         } catch (SQLException e) {
@@ -192,7 +253,7 @@ public class AdminController {
         dialog.setTitle("Modificar Usuario");
 
         // Campos del formulario
-        TextField dniField = new TextField(usuarioSeleccionado.getDNI()); // Ahora editable
+        TextField dniField = new TextField(usuarioSeleccionado.getDNI());
         TextField nombreField = new TextField(usuarioSeleccionado.getNombre());
         TextField edadField = new TextField(String.valueOf(usuarioSeleccionado.getEdad()));
         ComboBox<String> sexoComboBox = new ComboBox<>(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));
@@ -252,7 +313,7 @@ public class AdminController {
             ps.setString(4, sexo);
             ps.setBoolean(5, haVotado);
             ps.setBoolean(6, esAdmin);
-            ps.setString(7, dniAnterior); // Filtro por el DNI anterior
+            ps.setString(7, dniAnterior);
             ps.executeUpdate();
             cargarDatosUsuarios();
         } catch (SQLException e) {
