@@ -33,7 +33,7 @@ public class UsuarioModel extends DBUtil {
         return resultado;
     }
 
-    // Método para insertar un nuevo usuario (si fuera necesario)
+    // Método para insertar un nuevo usuario
     public boolean insert(Usuario u) {
         boolean resultado = false;
         try {
