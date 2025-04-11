@@ -14,6 +14,8 @@ import java.sql.*;
 
 
 public class GeneralController {
+    @FXML
+    private Label labelTop3;
 
     @FXML
     private TableView<Partido> tablaPartidos;
@@ -35,6 +37,7 @@ public class GeneralController {
     @FXML
     public void initialize() {
         cargarDatosPartidos();
+        cargarTop3();
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colSiglas.setCellValueFactory(new PropertyValueFactory<>("siglas"));
         colVotos.setCellValueFactory(new PropertyValueFactory<>("votos"));
@@ -185,4 +188,49 @@ public class GeneralController {
             mostrarAlerta("Error", "No se pudo cargar el login", Alert.AlertType.ERROR);
         }
     }
+    private void cargarTop3() {
+        ObservableList<Partido> top3 = cargarTop3Partidos();  // Obtiene los partidos con más votos
+        StringBuilder sb = new StringBuilder("Top 3 partidos con más votos:\n\n");
+
+        // Si la lista está vacía, muestra un mensaje
+        if (top3.isEmpty()) {
+            sb.append("No se han registrado votos aún.");
+        } else {
+            // Agrega los partidos al StringBuilder
+            for (int i = 0; i < top3.size(); i++) {
+                Partido p = top3.get(i);
+                sb.append((i + 1))
+                        .append(". ")
+                        .append(p.getNombre())
+                        .append(" (")
+                        .append(p.getSiglas())
+                        .append("): ")
+                        .append(p.getVotos())
+                        .append(" votos\n");
+            }
+        }
+
+        // Actualiza el texto del Label con el resultado del Top 3
+        labelTop3.setText(sb.toString());
+    }
+
+    private ObservableList<Partido> cargarTop3Partidos() {
+        ObservableList<Partido> top3 = FXCollections.observableArrayList();
+        String query = "SELECT nombre, siglas, votos FROM partido ORDER BY votos DESC LIMIT 3";  // Consulta para los 3 partidos con más votos
+
+        try (Connection conn = dbUtil.getConexion();
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                top3.add(new Partido(rs.getString("nombre"), rs.getInt("votos"), rs.getString("siglas")));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return top3;
+    }
+
 }
