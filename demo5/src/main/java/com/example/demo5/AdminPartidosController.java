@@ -31,12 +31,11 @@ public class AdminPartidosController {
     @FXML private Button btnvolverAtras;
     @FXML private Button btnCerrarSesion;
     @FXML private Button btnVerUsuarios;
-    // Formulario embebido (opcional)
     @FXML private AnchorPane formAgregarPartido;
     @FXML private TextField nombrePartidoField;
     @FXML private TextField siglasPartidoField;
     @FXML private TextField votosPartidoField;
-
+    @FXML
     private ObservableList<Partido> partidosList = FXCollections.observableArrayList();
     private DBUtil dbUtil = new DBUtil();
 
@@ -53,7 +52,6 @@ public class AdminPartidosController {
 
     private void cargarDatosPartidos() {
         partidosList.clear();
-        // Asegurarnos de que estamos obteniendo los datos correctamente
         String query = "SELECT id, nombre, siglas, votos FROM partido";
 
         try (Connection conn = dbUtil.getConexion();
@@ -77,8 +75,47 @@ public class AdminPartidosController {
 
     @FXML
     private void agregarPartido() {
-        formAgregarPartido.setVisible(true); // Mostrar el formulario embebido
+        Dialog<Partido> dialog = new Dialog<>();
+        dialog.setTitle("Agregar Partido");
+
+        TextField nombreField = new TextField();
+        TextField siglasField = new TextField();
+        TextField votosField = new TextField();
+
+        VBox contenido = new VBox(10,
+                new Label("Nombre"), nombreField,
+                new Label("Siglas"), siglasField,
+                new Label("Votos"), votosField
+        );
+
+        dialog.getDialogPane().setContent(contenido);
+        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == btnGuardar) {
+                try {
+                    int votos = Integer.parseInt(votosField.getText());
+                    String nombre = nombreField.getText();
+                    String siglas = siglasField.getText();
+
+                    if (nombre.isEmpty() || siglas.isEmpty()) {
+                        mostrarAlerta("Campos vacíos", "Todos los campos son obligatorios", Alert.AlertType.WARNING);
+                        return null;
+                    }
+
+                    agregarPartidoDB(0, nombre, siglas, votos);  // id = 0 porque es autoincremental
+                } catch (NumberFormatException e) {
+                    mostrarAlerta("Error", "Votos inválidos", Alert.AlertType.ERROR);
+                }
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
     }
+
+
 
     @FXML
     private void guardarPartido() {
@@ -99,7 +136,7 @@ public class AdminPartidosController {
             return;
         }
 
-        // Aquí id es 0 porque es autoincremental
+        // Aquí id es 0 porque es autoincremental pero no se por que no lo hace bien
         int id = 0;
         agregarPartidoDB(id, nombre, siglas, votos);
         limpiarFormulario();
@@ -177,7 +214,6 @@ public class AdminPartidosController {
         Dialog<Partido> dialog = new Dialog<>();
         dialog.setTitle("Modificar Partido");
 
-        // Campos del formulario
         TextField nombreField = new TextField(partidoSeleccionado.getNombre());
         TextField siglasField = new TextField(partidoSeleccionado.getSiglas());
         TextField votosField = new TextField(String.valueOf(partidoSeleccionado.getVotos()));
@@ -283,4 +319,24 @@ public class AdminPartidosController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+    @FXML
+    private void volverPantallaAnterior() {
+        volverAtras();
+    }
+
+    @FXML
+    private void volverAtras() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("admin-view.fxml"));
+            Scene scene = new Scene(loader.load(), 700, 640);
+            Stage stage = (Stage) btnvolverAtras.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Panel de Administración");
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo volver a la pantalla anterior", Alert.AlertType.ERROR);
+        }
+    }
+
+
 }
