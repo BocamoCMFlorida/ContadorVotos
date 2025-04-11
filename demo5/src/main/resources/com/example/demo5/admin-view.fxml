@@ -12,10 +12,8 @@
             prefHeight="400.0" prefWidth="600.0">
 
     <VBox spacing="10" alignment="CENTER" prefWidth="600.0">
-        <!-- Título -->
         <Label text="Panel de Administrador" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
-        <!-- Tabla de Usuarios -->
         <TableView fx:id="tablaUsuarios" prefHeight="250.0" prefWidth="580.0">
             <columns>
                 <TableColumn text="DNI" fx:id="columnaDNI" prefWidth="100"/>
@@ -28,7 +26,6 @@
             </columns>
         </TableView>
 
-        <!-- Botones principales -->
         <HBox spacing="10" alignment="CENTER">
             <Button text="Agregar Usuario" fx:id="btnAgregarUsuario" onAction="#agregarUsuario"/>
             <Button text="Eliminar Usuario" fx:id="btnEliminarUsuario" onAction="#eliminarUsuario"/>
