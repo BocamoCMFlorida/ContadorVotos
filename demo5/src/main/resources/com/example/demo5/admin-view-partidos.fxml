@@ -27,6 +27,7 @@
             <Button text="Agregar Partido" fx:id="btnAgregarPartido" onAction="#agregarPartido"/>
             <Button text="Eliminar Partido" fx:id="btnEliminarPartido" onAction="#eliminarPartido"/>
             <Button text="Modificar Partido" fx:id="btnModificarPartido" onAction="#modificarPartido"/>
+            <Button text="Volver" fx:id="btnvolverAtras" onAction="#volverPantallaAnterior"/>
             <Button text="Cerrar Sesión" fx:id="btnCerrarSesion" onMouseClicked="#cerrarSesion"/>
 
         </HBox>
