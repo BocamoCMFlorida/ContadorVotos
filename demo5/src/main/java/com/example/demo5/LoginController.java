@@ -53,18 +53,15 @@ public class LoginController {
 
         // Conexión a la base de datos
         try (PreparedStatement ps = conn.prepareStatement(query)) {
-            // Configurar los parámetros de la consulta
             ps.setString(1, dni);
             ps.setString(2, password);
 
-            // Ejecutar la consulta
             try (ResultSet rs = ps.executeQuery()) {
                 // Si se encuentra un registro que coincida con el DNI y la contraseña, se realiza login
                 if (rs.next()) {
                     // Obtener si el usuario es administrador
                     boolean esAdmin = rs.getBoolean("es_admin");
 
-                    // Crear un objeto Usuario con los datos obtenidos
                     Usuario usuario = new Usuario(
                             rs.getString("DNI"),
                             rs.getString("contraseña"),
@@ -78,7 +75,7 @@ public class LoginController {
                     // Guardar el usuario autenticado en la sesión
                     Usuario.setUsuarioActual(usuario);
 
-                    return true;  // Login exitoso
+                    return true;
                 }
             }
         } catch (SQLException e) {
