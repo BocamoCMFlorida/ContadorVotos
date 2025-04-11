@@ -34,7 +34,6 @@ public class AdminController {
     @FXML private Button btnModificarUsuario;
     @FXML private Button btnCerrarSesion;
     @FXML private Button btnVerpartidos;
-    // Formulario embebido (opcional)
     @FXML private AnchorPane formAgregarUsuario;
     @FXML private TextField dniField;
     @FXML private TextField nombreField;
@@ -62,7 +61,6 @@ public class AdminController {
         cargarDatosUsuarios();
     }
 
-    // CAMBIO: agregar columna de contraseña al SELECT
     private void cargarDatosUsuarios() {
         usuariosList.clear();
         String query = "SELECT DNI, nombre, edad, sexo, contraseña, HaVotado, es_admin FROM usuario";
@@ -82,7 +80,6 @@ public class AdminController {
                 boolean esAdmin = rs.getBoolean("es_admin");
                 if (rs.wasNull()) esAdmin = false;
 
-                // Asegúrate que el orden de parámetros coincida con tu constructor de Usuario
                 usuariosList.add(new Usuario(dni, contraseña, nombre, edad, sexo, haVotado, esAdmin));
             }
 
@@ -166,7 +163,6 @@ public class AdminController {
             return;
         }
 
-        // Llamar al método correcto con contraseña
         agregarUsuarioDB(dni, nombre, edad, sexo, esAdmin, contraseña);
 
         limpiarFormulario();
@@ -174,7 +170,6 @@ public class AdminController {
     }
 
 
-    // CAMBIO IMPORTANTE: este método tenía error en la cantidad de parámetros en la consulta SQL
     private void agregarUsuarioDB(String dni, String nombre, int edad, String sexo, boolean esAdmin, String contraseña) {
         String query = "INSERT INTO usuario (DNI, nombre, edad, sexo, contraseña, HaVotado, es_admin) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -184,8 +179,8 @@ public class AdminController {
             ps.setString(2, nombre);
             ps.setInt(3, edad);
             ps.setString(4, sexo);
-            ps.setString(5, contraseña); // Corregido: antes estaba usando setBoolean por error
-            ps.setBoolean(6, false); // HaVotado por defecto false
+            ps.setString(5, contraseña);
+            ps.setBoolean(6, false);
             ps.setBoolean(7, esAdmin);
             ps.executeUpdate();
             cargarDatosUsuarios();
